@@ -7,10 +7,8 @@ import scala.collection.immutable.Seq
 class ComponentService {
   private var components: Seq[Component] = Seq.empty
 
-  def save(component: Component): Component = {
+  def save(component: Component): Unit =
     components = components.filterNot(_.id == component.id) :+ component
-    component
-  }
 
   def findById(id: String): Option[Component] = components.find(_.id == id)
 
