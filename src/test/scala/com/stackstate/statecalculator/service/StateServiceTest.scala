@@ -82,6 +82,7 @@ class StateServiceTest extends AnyWordSpec with Matchers {
 
   "When there is an unidirectional dependency" should {
 
+    // app -> db
     "propagate the derived change to the dependency (assignment example)" in new Context {
       private val checkStates = Map(CPU_LOAD -> NoData, RAM_USAGE -> NoData)
 
@@ -106,6 +107,7 @@ class StateServiceTest extends AnyWordSpec with Matchers {
       component("db").derivedState shouldBe Warning
     }
 
+    // app3 -> app2 -> app1
     "propagate the derived change in a chain of dependencies" in new Context {
       withComponents(
         Component("app1", dependencyOf = Some(Seq("app2"))),
@@ -126,6 +128,7 @@ class StateServiceTest extends AnyWordSpec with Matchers {
       component("app3").derivedState shouldBe NoData
     }
 
+    // app2 -> app1 <- app3
     "propagate the derived change to all the components depending on the component" in new Context {
       withComponents(
         Component("app1", dependencyOf = Some(Seq("app2", "app3"))),
@@ -146,6 +149,8 @@ class StateServiceTest extends AnyWordSpec with Matchers {
       component("app3").derivedState shouldBe NoData
     }
 
+    // app2 -> app1 <- app3
+    // app4 ---^ ^---- app5
     "set the derived state to the highest dependent derived" in new Context {
       withComponents(
         Component("app1", dependsOn = Some(Seq("app2", "app3", "app4", "app5"))),
@@ -172,6 +177,7 @@ class StateServiceTest extends AnyWordSpec with Matchers {
 
   "When the component has a circular dependency" should {
 
+    // app1 <-> app2
     "update its state and the derived state of the related component" in new Context {
       withComponents(
         Component("app1", dependsOn = Some(Seq("app2")), dependencyOf = Some(Seq("app2"))),
@@ -187,6 +193,7 @@ class StateServiceTest extends AnyWordSpec with Matchers {
       component("app2").derivedState shouldBe Warning
     }
 
+    // app1 <-> app2
     "update the states without propagating the clear state" in new Context {
       withComponents(
         Component("app1", dependsOn = Some(Seq("app2")), dependencyOf = Some(Seq("app2"))),
@@ -205,6 +212,8 @@ class StateServiceTest extends AnyWordSpec with Matchers {
       component("app2").derivedState shouldBe NoData
     }
 
+    // app4 -> app3 -> app2 -> app1
+    //  ^-----------------------|
     "be able to recover in graph with circular dependency of multiple components" in new Context {
       withComponents(
         Component("app1", dependsOn = Some(Seq("app4")), dependencyOf = Some(Seq("app2"))),
@@ -238,6 +247,8 @@ class StateServiceTest extends AnyWordSpec with Matchers {
       component("app4").derivedState shouldBe NoData
     }
 
+    // app1 <-> app2 <-> app3
+    //  ^-----------------^
     "be able to recover in graph where all components depend on each other" in new Context {
       withComponents(
         Component("app1", dependsOn = Some(Seq("app2", "app3")), dependencyOf = Some(Seq("app2", "app3"))),
@@ -269,6 +280,8 @@ class StateServiceTest extends AnyWordSpec with Matchers {
 
   "When there are inconsistencies in the initial state" should {
 
+    // app1 -|
+    //  ^----|
     "handle self-dependencies" in new Context {
       withComponents(Component("app", dependsOn = Some(Seq("app")), dependencyOf = Some(Seq("app"))))
 
