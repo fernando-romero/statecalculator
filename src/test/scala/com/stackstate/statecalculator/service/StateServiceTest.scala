@@ -304,7 +304,7 @@ class StateServiceTest extends AnyWordSpec with Matchers {
 
     "handle inconsistent dependencyOf" in new Context {
       withComponents(
-        Component("app1", dependencyOf = Some(Seq.empty)), // missing app1 in dependencyOf
+        Component("app1", dependencyOf = Some(Seq.empty)), // missing app2 in dependencyOf
         Component("app2", dependsOn = Some(Seq("app1")))
       )
 
@@ -319,7 +319,7 @@ class StateServiceTest extends AnyWordSpec with Matchers {
 
     "handle inconsistent dependsOn" in new Context {
       withComponents(
-        Component("app1", dependsOn = Some(Seq.empty)), // missing app1 in dependencyOf
+        Component("app1", dependsOn = Some(Seq.empty)), // missing app2 in dependsOn
         Component("app2", dependencyOf = Some(Seq("app1")))
       )
 
