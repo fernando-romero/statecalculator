@@ -4,7 +4,7 @@ lazy val root = (project in file(".")).
   settings(
     inThisBuild(List(
       organization    := "com.stackstate",
-      scalaVersion    := "2.12.7"
+      scalaVersion    := "2.12.10"
     )),
     name := "statecalculator",
     libraryDependencies ++= Seq(
