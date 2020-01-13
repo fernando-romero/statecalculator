@@ -1,13 +1,12 @@
 package com.stackstate.statecalculator.service
 
-import com.stackstate.statecalculator.model.Component
+import com.stackstate.statecalculator.model.{Clear, Component, Warning}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
 import scala.collection.immutable.Seq
 
 object ComponentServiceTest {
-
   val app1 = Component("app1")
   val app2 = Component("app2")
   val app3 = Component("app3")
@@ -43,5 +42,12 @@ class ComponentServiceTest extends AnyWordSpec with Matchers {
     componentService.save(app3)
 
     componentService.findAll() shouldBe Seq(app1, app2, app3)
+  }
+
+  "Should keep the latest in case of duplicates" in new Context {
+    componentService.save(app1.copy(id = "app", ownState = Warning))
+    componentService.save(app2.copy(id = "app", ownState = Clear))
+
+    componentService.findById("app").map(_.ownState) shouldBe Some(Clear)
   }
 }
