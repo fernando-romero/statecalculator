@@ -23,7 +23,6 @@ object Main {
 
     application
       .run(componentsFile, eventsFile)
-      // .map(System.out.println)
       .andThen {
         case Success(graph) => System.out.println(graph)
         case Failure(e) => System.err.println(e.getMessage)
